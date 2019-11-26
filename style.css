@@ -1,0 +1,12 @@
+/* 工具方法 */
+.tac {
+  text-align: center;
+}
+
+/* 布局样式 */
+.wrapper {
+  margin: 0 auto;
+  padding: 6vw;
+  background-color: #fff;
+  max-width: 760px;
+}
