@@ -16,28 +16,50 @@
       <section>
         <h2>基本信息</h2>
         <div id="form">
-          <mu-form :model="params" label-position="left">
-            <mu-form-item label="证件类型" prop="certificate_type" :rules="rules.certificate_type">
+          <mu-form :model="params" label-position="top">
+            <mu-form-item label="证件类型" prop="certificate_type" label-float :rules="rules.certificate_type">
               <mu-select v-model="params.certificate_type">
-                <mu-option v-for="{ label, value } in options" :key="value" :label="label" :value="value"></mu-option>
+                <mu-option v-for="{ label, value } in certList" :key="value" :label="label" :value="value"></mu-option>
               </mu-select>
             </mu-form-item>
-            <mu-form-item label="证件号码" prop="certificate_code" :rules="rules.certificate_code">
-              <mu-text-field v-model="params.certificate_code" placeholder="证件号码"></mu-text-field>
+            <mu-form-item label="证件号码" prop="certificate_code" label-float :rules="rules.certificate_code">
+              <mu-text-field v-model="params.certificate_code"></mu-text-field>
             </mu-form-item>
-            <mu-form-item label="姓名" prop="name" :rules="rules.name">
-              <mu-text-field v-model="params.name" placeholder="证件号码"></mu-text-field>
+            <mu-form-item label="姓名" prop="name" label-float :rules="rules.name">
+              <mu-text-field v-model="params.name"></mu-text-field>
             </mu-form-item>
-            <mu-form-item label="性别" prop="gender" :rules="rules.gender">
+            <mu-form-item label="性别" prop="gender" label-float :rules="rules.gender">
               <mu-select v-model="params.gender">
                 <mu-option label="未知" value="0"></mu-option>
                 <mu-option label="男" value="1"></mu-option>
                 <mu-option label="女" value="2"></mu-option>
               </mu-select>
             </mu-form-item>
-            <mu-form-item label="出生日期" prop="birth">
-              <mu-date-input v-model="params.birth" label="出生日期" container="bottomSheet" full-width no-display></mu-date-input>
+            <mu-form-item label="出生日期" prop="birth" label-float>
+              <mu-date-input v-model="params.birth" container="bottomSheet" full-width no-display></mu-date-input>
             </mu-form-item>
+            <mu-form-item label="国籍" prop="country" label-float>
+              <mu-select v-model="params.country">
+                <mu-option v-for="{ label, value } in countryList" :key="value" :label="label" :value="value"></mu-option>
+              </mu-select>
+            </mu-form-item>
+            <mu-form-item label="学历" prop="education" label-float>
+              <mu-select v-model="params.education">
+                <mu-option v-for="{ label, value } in eduList" :key="value" :label="label" :value="value"></mu-option>
+              </mu-select>
+            </mu-form-item>
+            <mu-form-item label="是否存在以下情形" prop="identity">
+              <mu-checkbox value="1" v-model="params.identity" label="残疾"></mu-checkbox>
+              <mu-checkbox value="2" v-model="params.identity" label="烈属"></mu-checkbox>
+              <mu-checkbox value="3" v-model="params.identity" label="孤老"></mu-checkbox>
+            </mu-form-item>
+            <mu-form-item v-if="params.identity.includes('1')" label="残疾证号" prop="disability_number" label-float :rules="rules.disability_number">
+              <mu-text-field v-model="params.disability_number"></mu-text-field>
+            </mu-form-item>
+            <mu-form-item v-if="params.identity.includes('2')" label="烈属证号" prop="martyred_number" label-float :rules="rules.martyred_number">
+              <mu-text-field v-model="params.martyred_number"></mu-text-field>
+            </mu-form-item>
+            <mu-button full-width color="primary">提交</mu-button>
           </mu-form>
         </div>
       </section>
@@ -46,6 +68,7 @@
     <script src="https://unpkg.com/muse-ui/dist/muse-ui.js"></script>
     <script>
       Vue.config.devtools = true
+      const certificate_reg = /^[1-9]\d{7}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}$|^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}([0-9]|X)$/
       const form = new Vue({
         data() {
           return {
@@ -54,9 +77,13 @@
               certificate_code: '',
               name: '',
               gender: '',
-              birth: ''
+              birth: '',
+              education: '',
+              identity: [],
+              disability_number: '',
+              martyred_number: ''
             },
-            options: [
+            certList: [
               {
                 label: '居民身份证',
                 value: '1'
@@ -64,6 +91,18 @@
               {
                 label: '护照',
                 value: '2'
+              }
+            ],
+            countryList: [
+              {
+                label: '中国',
+                value: 'CN'
+              }
+            ],
+            eduList: [
+              {
+                label: '本科',
+                value: '1'
               }
             ],
             rules: {
@@ -77,6 +116,13 @@
                 {
                   validate: val => !!val,
                   message: '请输入证件号码'
+                },
+                {
+                  validate: value => {
+                    if (this.params.certificate_type === '1') return certificate_reg.test(value)
+                    return true
+                  },
+                  message: '请输入正确的证件号码'
                 }
               ],
               name: [
@@ -89,6 +135,18 @@
                 {
                   validate: val => !!val,
                   message: '请选择性别'
+                }
+              ],
+              disability_number: [
+                {
+                  validate: value => !!value,
+                  message: '请输入残疾证号'
+                }
+              ],
+              martyred_number: [
+                {
+                  validate: value => !!value,
+                  message: '请输入烈属证号'
                 }
               ]
             }
