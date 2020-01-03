@@ -6,7 +6,16 @@
 /* 布局样式 */
 .wrapper {
   margin: 0 auto;
-  padding: 6vw;
-  background-color: #fff;
+  background-color: #f7f7f7;
   max-width: 760px;
+  overflow: hidden;
+}
+
+.form-paper {
+  padding: 10px 2vw;
+  margin-bottom: 5px;
+}
+.form-paper .mu-form-item {
+  margin-bottom: 0;
+  padding-bottom: 0;
 }
